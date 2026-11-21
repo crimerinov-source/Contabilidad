@@ -1,0 +1,2767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control Financiero Personal 2026</title>
+  <!-- SheetJS opcional para exportacion .xlsx; si no carga, hay exportacion CSV/JSON garantizada -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --navy: #0f172a;
+      --navy-2: #1e293b;
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --teal-soft: #f0fdfa;
+      --emerald: #059669;
+      --emerald-soft: #ecfdf5;
+      --rose: #e11d48;
+      --rose-soft: #fff1f2;
+      --amber: #d97706;
+      --amber-soft: #fffbeb;
+      --sky: #0284c7;
+      --sky-soft: #f0f9ff;
+      --radius: 14px;
+      --radius-sm: 9px;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .num {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Banner de errores globales para evitar pantalla en blanco */
+    #error-banner {
+      display: none;
+      background: #7f1d1d;
+      color: #fef2f2;
+      padding: 12px 18px;
+      font-size: 13px;
+      border-bottom: 2px solid #fca5a5;
+      z-index: 9999;
+    }
+
+    #error-banner strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* Encabezado superior */
+    header.app-header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16);
+    }
+
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--teal);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tab-btn {
+      appearance: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      padding: 8px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+    }
+
+    .tab-btn.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(13, 148, 136, 0.4);
+    }
+
+    /* Contenedor principal */
+    main {
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px;
+      flex: 1;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Tarjetas y bloques */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .card-sub {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Barra de periodo */
+    .period-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .period-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .field-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-alt);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 10px;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.14);
+    }
+
+    .select-highlight {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      font-weight: 700;
+    }
+
+    .pill-counter {
+      background: var(--teal-soft);
+      color: var(--teal-dark);
+      border: 1px solid #99f6e4;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .cap-inicial-box {
+      background: var(--navy);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .cap-inicial-box small {
+      display: block;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+    }
+
+    .cap-inicial-box strong {
+      font-size: 18px;
+      font-weight: 800;
+      color: #2dd4bf;
+    }
+
+    /* Botones */
+    .btn {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 8px 13px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--ink);
+      border-color: #cbd5e1;
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-alt);
+    }
+
+    .btn-danger-soft {
+      background: var(--rose-soft);
+      color: var(--rose);
+      border-color: #fecdd3;
+    }
+
+    .btn-danger-soft:hover {
+      background: #ffe4e6;
+    }
+
+    .btn-success-soft {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border-color: #a7f3d0;
+    }
+
+    .btn-success-soft:hover {
+      background: #d1fae5;
+    }
+
+    .btn-sm {
+      padding: 5px 9px;
+      font-size: 11.5px;
+    }
+
+    /* 6 Tarjetas KPI */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 15px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .kpi-card.hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+      color: #ffffff;
+      border-color: var(--navy);
+    }
+
+    .kpi-card.warn-tint {
+      background: var(--amber-soft);
+      border-color: #fde68a;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi-card.hero .kpi-label {
+      color: #5eead4;
+    }
+
+    .kpi-card.warn-tint .kpi-label {
+      color: #92400e;
+    }
+
+    .kpi-value {
+      font-size: 23px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .kpi-sub {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .kpi-card.hero .kpi-sub {
+      color: #94a3b8;
+    }
+
+    /* Grillas de contenido */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-dash-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-dash-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Tablas */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--navy);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 10px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    thead th.right,
+    tbody td.right,
+    tfoot td.right {
+      text-align: right;
+    }
+
+    thead th.center,
+    tbody td.center,
+    tfoot td.center {
+      text-align: center;
+    }
+
+    tbody td {
+      padding: 8px 10px;
+      border-top: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    tfoot td {
+      background: #f1f5f9;
+      font-weight: 800;
+      padding: 10px 10px;
+      border-top: 2px solid #cbd5e1;
+    }
+
+    tfoot.total-dark td {
+      background: var(--navy);
+      color: #ffffff;
+      border-top-color: var(--navy);
+    }
+
+    /* Semaforo presupuesto y badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .badge-ok {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid #a7f3d0;
+    }
+
+    .badge-warn {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border: 1px solid #fde68a;
+    }
+
+    .badge-over {
+      background: var(--rose-soft);
+      color: var(--rose);
+      border: 1px solid #fecdd3;
+    }
+
+    .progress-bar {
+      width: 90px;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 999px;
+    }
+
+    /* Formularios y filtros */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+    }
+
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    /* Canvas charts */
+    canvas.chart-canvas {
+      width: 100%;
+      display: block;
+      background: #ffffff;
+      border-radius: 10px;
+    }
+
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-alt);
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .chip button {
+      border: none;
+      background: transparent;
+      color: var(--rose);
+      font-weight: 800;
+      cursor: pointer;
+      padding: 0 2px;
+    }
+
+    .toast-box {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 9000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast-msg {
+      background: var(--navy);
+      color: #ffffff;
+      border-left: 4px solid var(--teal);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+    }
+
+    footer {
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 12px 18px 20px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Aviso de error global para que nunca quede en blanco -->
+  <div id="error-banner" role="alert">
+    <strong>Se detectó un error en la aplicación (recuperado de forma segura):</strong>
+    <span id="error-detail"></span>
+  </div>
+
+  <!-- Encabezado y 5 Pestañas -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-badge">CF</div>
+        <div>
+          <h1>Control Financiero Personal 2026</h1>
+          <p>Libro personal en HTML • Guardado automático local • Sin dependencias bloqueantes</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Secciones principales">
+        <button type="button" class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">1. Resumen Dashboard</button>
+        <button type="button" class="tab-btn" data-tab="gastos" onclick="switchTab('gastos')">2. Gastos</button>
+        <button type="button" class="tab-btn" data-tab="ingresos" onclick="switchTab('ingresos')">3. Ingresos</button>
+        <button type="button" class="tab-btn" data-tab="config" onclick="switchTab('config')">4. Config Listas</button>
+        <button type="button" class="tab-btn" data-tab="anual" onclick="switchTab('anual')">5. Resumen Anual</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 1: RESUMEN DASHBOARD                                          -->
+    <!-- ===================================================================== -->
+    <section id="panel-dashboard" class="tab-panel active">
+      <div class="card">
+        <div class="period-bar">
+          <div class="period-controls">
+            <div class="field-inline">
+              <label for="dash-mes">Mes:</label>
+              <select id="dash-mes" class="select-highlight" onchange="onDashboardPeriodChange()"></select>
+            </div>
+            <div class="field-inline">
+              <label for="dash-anio">Año:</label>
+              <select id="dash-anio" class="select-highlight" onchange="onDashboardPeriodChange()">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+            <span id="dash-contador" class="pill-counter num">0 movimientos en el periodo</span>
+            <button type="button" class="btn btn-danger-soft btn-sm" onclick="quickAddMovement('gasto')">+ Gasto en este mes</button>
+            <button type="button" class="btn btn-success-soft btn-sm" onclick="quickAddMovement('ingreso')">+ Ingreso en este mes</button>
+          </div>
+
+          <div class="cap-inicial-box">
+            <div>
+              <small>Capital Inicial (<span id="dash-cap-mes-label">Noviembre</span>)</small>
+              <strong id="dash-cap-inicial" class="num">$727.75</strong>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="switchTab('config')">Editar por mes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 Tarjetas KPI Grandes -->
+      <div class="kpi-grid">
+        <div class="kpi-card hero">
+          <div class="kpi-label">Capital Actual Disponible</div>
+          <div id="kpi-capital-actual" class="kpi-value num">$0.00</div>
+          <div class="kpi-sub">Capital Inicial + Ahorro Neto del mes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ingresos del Mes</div>
+          <div id="kpi-ingresos" class="kpi-value num" style="color: var(--emerald);">$0.00</div>
+          <div class="kpi-sub">Total ingresos en periodo elegido</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Gastos Totales del Mes</div>
+          <div id="kpi-gastos" class="kpi-value num" style="color: var(--rose);">$0.00</div>
+          <div class="kpi-sub">Total gastos en periodo elegido</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ahorro Neto del Mes</div>
+          <div id="kpi-ahorro-neto" class="kpi-value num">$0.00</div>
+          <div class="kpi-sub">Ingresos − Gastos del mes</div>
+        </div>
+        <div class="kpi-card warn-tint">
+          <div class="kpi-label">Gasto Innecesario / Ahorro Posible</div>
+          <div id="kpi-innecesario" class="kpi-value num" style="color: #b45309;">$0.00</div>
+          <div class="kpi-sub">Gastos evitables del mes elegido</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">% de Ahorro del Mes</div>
+          <div id="kpi-pct-ahorro" class="kpi-value num" style="color: var(--teal-dark);">0.0%</div>
+          <div class="kpi-sub">Ahorro Neto ÷ Ingresos del mes</div>
+        </div>
+      </div>
+
+      <!-- 2 Gráficos Nativos en Canvas -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Gastos por Categoría ($)</h2>
+              <p class="card-sub" id="chart-cat-sub">Periodo activo</p>
+            </div>
+          </div>
+          <canvas id="canvas-categorias" class="chart-canvas" height="270"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Necesario vs. Innecesario</h2>
+              <p class="card-sub" id="chart-cal-sub">Diagnóstico de ahorro potencial</p>
+            </div>
+          </div>
+          <canvas id="canvas-calidad" class="chart-canvas" height="220"></canvas>
+          <p id="diagnostico-calidad" class="card-sub" style="margin-top: 10px; font-weight: 600; color: var(--ink);"></p>
+        </div>
+      </div>
+
+      <!-- Cuerpo Principal: Izquierda (Presupuesto + Calidad + Metas) / Derecha (Arqueo/Cuentas + Deudores) -->
+      <div class="grid-dash-main">
+        <div>
+          <!-- Tabla Control de Gastos y Presupuesto por Categoría -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Control de Gastos y Presupuesto por Categoría</h2>
+                <p class="card-sub">Semáforo: verde &lt;80%, ámbar 80–100%, rojo &gt;100%. Puedes editar el presupuesto aquí.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Categoría</th>
+                    <th class="right">Presupuesto ($)</th>
+                    <th class="right">Gastado ($)</th>
+                    <th class="center">% Presupuesto</th>
+                    <th class="right">% del Gasto</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-dash-categorias"></tbody>
+                <tfoot id="tfoot-dash-categorias" class="total-dark"></tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tabla Calidad del Gasto -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Calidad del Gasto (Necesario vs. Innecesario)</h2>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tipo de Gasto</th>
+                    <th class="right">Monto ($)</th>
+                    <th class="right">% del Gasto</th>
+                    <th>Lectura Financiera</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-dash-calidad"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Metas de Ahorro Personal -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Metas de Ahorro Personal</h2>
+                <p class="card-sub">Actualiza objetivo y ahorrado directamente</p>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="addMeta()">+ Nueva Meta</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Meta</th>
+                    <th class="right">Objetivo ($)</th>
+                    <th class="right">Ahorrado ($)</th>
+                    <th class="right">Falta ($)</th>
+                    <th>% Avance</th>
+                    <th class="center">Quitar</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-metas"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Capital por Lugar y Arqueo de Efectivo -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Capital por Lugar y Arqueo de Efectivo</h2>
+                <p class="card-sub">Efectivo = Billetes + Monedas; Por Cobrar = Deudores Pendientes</p>
+              </div>
+            </div>
+
+            <div class="form-grid" style="margin-bottom: 12px; background: var(--surface-alt); padding: 10px; border-radius: 10px; border: 1px solid var(--line);">
+              <div class="form-group">
+                <label for="arq-billetes">Billetes ($)</label>
+                <input type="number" step="0.01" min="0" id="arq-billetes" onchange="updateArqueo()" />
+              </div>
+              <div class="form-group">
+                <label for="arq-monedas">Monedas ($)</label>
+                <input type="number" step="0.01" min="0" id="arq-monedas" onchange="updateArqueo()" />
+              </div>
+              <div class="form-group">
+                <label>Total Efectivo</label>
+                <div id="arq-total-box" class="num" style="padding: 7px 10px; font-weight: 800; background: var(--teal-soft); color: var(--teal-dark); border-radius: 8px; border: 1px solid #99f6e4;">$0.00</div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Lugar / Cuenta</th>
+                    <th class="right">Saldo ($)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Efectivo Físico</strong> (Auto Arqueo)</td>
+                    <td id="lug-efectivo" class="right num" style="font-weight: 700;">$0.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>BancoMóvil</strong></td>
+                    <td class="right">
+                      <input type="number" step="0.01" id="lug-bancomovil" style="width: 110px; text-align: right;" class="num" onchange="updateCuentas()" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Deuna</strong></td>
+                    <td class="right">
+                      <input type="number" step="0.01" id="lug-deuna" style="width: 110px; text-align: right;" class="num" onchange="updateCuentas()" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Dinero por Cobrar</strong> (Solo Pendientes)</td>
+                    <td id="lug-por-cobrar" class="right num" style="font-weight: 700; color: var(--sky);">$0.00</td>
+                  </tr>
+                </tbody>
+                <tfoot class="total-dark">
+                  <tr>
+                    <td>TOTAL PATRIMONIO LÍQUIDO</td>
+                    <td id="lug-total-patrimonio" class="right num" style="color: #2dd4bf;">$0.00</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Dinero Prestado (Deudores) -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Dinero Prestado (Deudores)</h2>
+                <p class="card-sub">Lista configurable en Config Listas • Solo "Pendiente" suma a Por Cobrar</p>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="addPrestamo()">+ Nuevo Préstamo</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Deudor</th>
+                    <th>Estado / Pago</th>
+                    <th class="right">Monto ($)</th>
+                    <th class="center">Quitar</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-prestamos"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3">TOTAL POR COBRAR (PENDIENTE)</td>
+                    <td id="total-por-cobrar-foot" class="right num" style="color: var(--amber);">$0.00</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 2: GASTOS                                                     -->
+    <!-- ===================================================================== -->
+    <section id="panel-gastos" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Registrar Nuevo Gasto</h2>
+            <p class="card-sub">Mes, Año y Semana se calculan automáticamente a partir de la Fecha</p>
+          </div>
+        </div>
+        <form id="form-gasto" class="form-grid" onsubmit="handleSaveGasto(event)">
+          <div class="form-group">
+            <label for="g-fecha">Fecha *</label>
+            <input type="date" id="g-fecha" required />
+          </div>
+          <div class="form-group">
+            <label for="g-categoria">Categoría *</label>
+            <select id="g-categoria" required></select>
+          </div>
+          <div class="form-group">
+            <label for="g-subcategoria">Subcategoría</label>
+            <input type="text" id="g-subcategoria" placeholder="Ej. Almuerzo, Bus..." />
+          </div>
+          <div class="form-group">
+            <label for="g-descripcion">Descripción *</label>
+            <input type="text" id="g-descripcion" required placeholder="Detalle del gasto" />
+          </div>
+          <div class="form-group">
+            <label for="g-tipo">Tipo de Gasto *</label>
+            <select id="g-tipo" required>
+              <option value="Necesario">Necesario</option>
+              <option value="Innecesario">Innecesario</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="g-monto">Monto ($) *</label>
+            <input type="number" step="0.01" min="0.01" id="g-monto" required placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label for="g-metodo">Método de Pago *</label>
+            <select id="g-metodo" required></select>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Guardar Gasto</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Detalle y Filtros de Gastos</h2>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetGastoFilters()">Limpiar filtros</button>
+        </div>
+
+        <div class="filters-row">
+          <select id="fg-mes" onchange="renderGastosTab()">
+            <option value="">Todos los Meses</option>
+          </select>
+          <select id="fg-anio" onchange="renderGastosTab()">
+            <option value="">Todos los Años</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+          <select id="fg-categoria" onchange="renderGastosTab()">
+            <option value="">Todas las Categorías</option>
+          </select>
+          <select id="fg-tipo" onchange="renderGastosTab()">
+            <option value="">Necesario e Innecesario</option>
+            <option value="Necesario">Necesario</option>
+            <option value="Innecesario">Innecesario</option>
+          </select>
+          <input type="text" id="fg-buscar" oninput="renderGastosTab()" placeholder="Buscar descripción..." style="min-width: 180px;" />
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Mes</th>
+                <th>Año</th>
+                <th>Semana</th>
+                <th>Categoría</th>
+                <th>Subcategoría</th>
+                <th>Descripción</th>
+                <th class="center">Tipo de Gasto</th>
+                <th class="right">Monto ($)</th>
+                <th>Método de Pago</th>
+                <th class="center">Eliminar</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-gastos"></tbody>
+            <tfoot id="tfoot-gastos"></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 3: INGRESOS                                                   -->
+    <!-- ===================================================================== -->
+    <section id="panel-ingresos" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Registrar Nuevo Ingreso</h2>
+            <p class="card-sub">Mes y Año se calculan automáticamente desde la Fecha</p>
+          </div>
+        </div>
+        <form id="form-ingreso" class="form-grid" onsubmit="handleSaveIngreso(event)">
+          <div class="form-group">
+            <label for="i-fecha">Fecha *</label>
+            <input type="date" id="i-fecha" required />
+          </div>
+          <div class="form-group">
+            <label for="i-fuente">Fuente / Origen *</label>
+            <select id="i-fuente" required></select>
+          </div>
+          <div class="form-group">
+            <label for="i-descripcion">Descripción *</label>
+            <input type="text" id="i-descripcion" required placeholder="Ej. Pago quincenal, Comisión..." />
+          </div>
+          <div class="form-group">
+            <label for="i-monto">Monto ($) *</label>
+            <input type="number" step="0.01" min="0.01" id="i-monto" required placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label for="i-destino">Destino / Cuenta *</label>
+            <select id="i-destino" required></select>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Guardar Ingreso</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Detalle y Filtros de Ingresos</h2>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetIngresoFilters()">Limpiar filtros</button>
+        </div>
+
+        <div class="filters-row">
+          <select id="fi-mes" onchange="renderIngresosTab()">
+            <option value="">Todos los Meses</option>
+          </select>
+          <select id="fi-anio" onchange="renderIngresosTab()">
+            <option value="">Todos los Años</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+          <select id="fi-fuente" onchange="renderIngresosTab()">
+            <option value="">Todas las Fuentes</option>
+          </select>
+          <input type="text" id="fi-buscar" oninput="renderIngresosTab()" placeholder="Buscar descripción..." style="min-width: 180px;" />
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Mes</th>
+                <th>Año</th>
+                <th>Fuente / Origen</th>
+                <th>Descripción</th>
+                <th class="right">Monto ($)</th>
+                <th>Destino / Cuenta</th>
+                <th class="center">Eliminar</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-ingresos"></tbody>
+            <tfoot id="tfoot-ingresos"></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 4: CONFIG LISTAS                                              -->
+    <!-- ===================================================================== -->
+    <section id="panel-config" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Exportación, Respaldo y Restablecimiento</h2>
+            <p class="card-sub">Exporta a Excel (.xlsx si está disponible o CSV compatible con Excel) y JSON</p>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button type="button" class="btn btn-primary" onclick="exportExcelOrCsv()">Exportar Excel (.xlsx / .csv)</button>
+            <button type="button" class="btn btn-secondary" onclick="exportJsonBackup()">Respaldo JSON</button>
+            <button type="button" class="btn btn-danger-soft" onclick="resetDemoData()">Restablecer Datos de Ejemplo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Categorías Gasto + Presupuesto Mensual -->
+        <div class="card">
+          <h2 class="card-title" style="margin-bottom: 10px;">Categorías de Gasto y Presupuesto Mensual ($)</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="cfg-cat-nombre" placeholder="Nueva categoría..." style="flex: 1; min-width: 150px;" />
+            <input type="number" step="1" min="0" id="cfg-cat-presup" placeholder="Presupuesto $" style="width: 120px;" />
+            <button type="button" class="btn btn-primary" onclick="addCategoria()">+ Agregar</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th class="right">Presupuesto ($)</th>
+                  <th class="center">Quitar</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-cfg-categorias"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Capital Inicial por Mes (Enero a Diciembre) -->
+        <div class="card">
+          <h2 class="card-title" style="margin-bottom: 4px;">Capital Inicial por Mes ($)</h2>
+          <p class="card-sub" style="margin-bottom: 10px;">Al cambiar el mes en el Dashboard, toma automáticamente este valor</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mes</th>
+                  <th class="right">Capital Inicial ($)</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-cfg-capital-mes"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Lista de Deudores -->
+        <div class="card">
+          <h2 class="card-title">Lista de Deudores</h2>
+          <p class="card-sub">Aparece en el desplegable de Dinero Prestado en el Dashboard</p>
+          <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <input type="text" id="cfg-deudor-input" placeholder="Nombre del deudor..." style="flex: 1;" />
+            <button type="button" class="btn btn-primary" onclick="addSimpleListItem('deudores', 'cfg-deudor-input')">+ Agregar</button>
+          </div>
+          <div id="chips-deudores" class="chip-list"></div>
+        </div>
+
+        <!-- Métodos / Cuentas y Fuentes Ingreso -->
+        <div class="card">
+          <h2 class="card-title">Métodos / Cuentas y Fuentes de Ingreso</h2>
+          <div style="margin-top: 10px;">
+            <label style="font-size: 12px; font-weight: 700; color: var(--muted);">Métodos / Cuentas</label>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <input type="text" id="cfg-metodo-input" placeholder="Ej. Efectivo, BancoMóvil..." style="flex: 1;" />
+              <button type="button" class="btn btn-secondary" onclick="addSimpleListItem('metodos', 'cfg-metodo-input')">+ Cuenta</button>
+            </div>
+            <div id="chips-metodos" class="chip-list"></div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <label style="font-size: 12px; font-weight: 700; color: var(--muted);">Fuentes de Ingreso</label>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <input type="text" id="cfg-fuente-input" placeholder="Ej. Trabajo, Mamá..." style="flex: 1;" />
+              <button type="button" class="btn btn-secondary" onclick="addSimpleListItem('fuentes', 'cfg-fuente-input')">+ Fuente</button>
+            </div>
+            <div id="chips-fuentes" class="chip-list"></div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <label style="font-size: 12px; font-weight: 700; color: var(--muted);">Tipos de Gasto (Catálogo)</label>
+            <div class="chip-list">
+              <span class="chip">Necesario</span>
+              <span class="chip">Innecesario</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 5: RESUMEN ANUAL                                              -->
+    <!-- ===================================================================== -->
+    <section id="panel-anual" class="tab-panel">
+      <div class="card">
+        <div class="period-bar">
+          <div>
+            <h2 class="card-title">Consolidado Financiero Anual (12 Meses)</h2>
+            <p class="card-sub">Ingresos, gastos necesarios e innecesarios, ahorro y capital de cierre por mes</p>
+          </div>
+          <div class="field-inline">
+            <label for="anual-anio">Año:</label>
+            <select id="anual-anio" class="select-highlight" onchange="renderAnualTab()">
+              <option value="2025">2025</option>
+              <option value="2026" selected>2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Comparativo Mensual: Ingresos vs. Gastos ($)</h3>
+        </div>
+        <canvas id="canvas-anual" class="chart-canvas" height="260"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th class="right">Capital Inicial ($)</th>
+                <th class="right">Ingresos ($)</th>
+                <th class="right">Gastos Totales ($)</th>
+                <th class="right">Gasto Necesario ($)</th>
+                <th class="right">Gasto Innecesario ($)</th>
+                <th class="right">Ahorro del Mes ($)</th>
+                <th class="right">% Ahorro</th>
+                <th class="right">Capital de Cierre ($)</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-anual"></tbody>
+            <tfoot id="tfoot-anual" class="total-dark"></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast-box" class="toast-box" aria-live="polite"></div>
+
+  <footer>
+    <span>Control Financiero Personal 2026 • Persistencia local automática</span>
+    <span id="storage-status">Estado de almacenamiento: listo</span>
+  </footer>
+
+  <script>
+    // =========================================================================
+    // MANEJADOR GLOBAL DE ERRORES (Evita pantalla en blanco ante cualquier fallo)
+    // =========================================================================
+    function showErrorBanner(message) {
+      const banner = document.getElementById("error-banner");
+      const detail = document.getElementById("error-detail");
+      if (banner && detail) {
+        detail.textContent = String(message || "Error inesperado");
+        banner.style.display = "block";
+      }
+    }
+
+    window.addEventListener("error", function (event) {
+      showErrorBanner(event && event.message ? event.message : "Error de ejecución en script");
+    });
+
+    window.addEventListener("unhandledrejection", function (event) {
+      const reason = event && event.reason ? (event.reason.message || String(event.reason)) : "Promesa rechazada";
+      showErrorBanner(reason);
+    });
+
+    // =========================================================================
+    // CONSTANTES Y ALMACENAMIENTO SEGURO CON FALLBACK EN MEMORIA
+    // =========================================================================
+    const MESES = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    const STORAGE_KEY = "cfp_2026_app_state_v1";
+    let memoryFallbackStorage = null;
+
+    function readStorageRaw() {
+      try {
+        if (window.localStorage) {
+          return window.localStorage.getItem(STORAGE_KEY);
+        }
+      } catch (e) {
+        // localStorage bloqueado por sandbox o privacidad
+      }
+      return memoryFallbackStorage;
+    }
+
+    function writeStorageRaw(text) {
+      memoryFallbackStorage = text;
+      const statusEl = document.getElementById("storage-status");
+      try {
+        if (window.localStorage) {
+          window.localStorage.setItem(STORAGE_KEY, text);
+          if (statusEl) statusEl.textContent = "Guardado automático en localStorage activo";
+          return true;
+        }
+      } catch (e) {
+        // Fallback a memoria si localStorage está restringido
+      }
+      if (statusEl) statusEl.textContent = "Respaldo activo en memoria de sesión (localStorage restringido)";
+      return false;
+    }
+
+    function getDefaultData() {
+      return {
+        activeMes: "Noviembre",
+        activeAnio: 2026,
+        categorias: [
+          { nombre: "Alimentación", presupuesto: 80 },
+          { nombre: "Transporte", presupuesto: 45 },
+          { nombre: "Salud", presupuesto: 50 },
+          { nombre: "Cuidado personal", presupuesto: 25 },
+          { nombre: "Telefonía", presupuesto: 15 },
+          { nombre: "Familia", presupuesto: 35 },
+          { nombre: "Ocio y entretenimiento", presupuesto: 30 },
+          { nombre: "Donaciones y solidaridad", presupuesto: 15 },
+          { nombre: "Hogar", presupuesto: 60 },
+          { nombre: "Educación", presupuesto: 25 },
+          { nombre: "Electrónica", presupuesto: 35 },
+          { nombre: "Vestimenta", presupuesto: 30 },
+          { nombre: "Otros", presupuesto: 20 }
+        ],
+        metodos: ["Efectivo", "BancoMóvil", "Deuna", "Transferencia"],
+        fuentes: ["Trabajo", "Mamá", "Comisiones", "Reembolso", "Otros"],
+        deudores: ["Geovanny", "Paquita", "David", "BAYRON", "Luis", "Diego", "Mamá"],
+        capitalPorMes: {
+          "Enero": 500.00,
+          "Febrero": 520.00,
+          "Marzo": 540.00,
+          "Abril": 560.00,
+          "Mayo": 580.00,
+          "Junio": 600.00,
+          "Julio": 620.00,
+          "Agosto": 640.00,
+          "Septiembre": 660.00,
+          "Octubre": 690.00,
+          "Noviembre": 727.75,
+          "Diciembre": 750.00
+        },
+        arqueo: {
+          billetes: 0.00,
+          monedas: 1.95
+        },
+        cuentas: {
+          bancomovil: 516.12,
+          deuna: 159.00
+        },
+        prestamos: [
+          { id: 1, fecha: "2026-10-18", deudor: "Geovanny", estado: "Pendiente", fechaPago: "", monto: 11.45 },
+          { id: 2, fecha: "2026-10-26", deudor: "Luis", estado: "Pendiente", fechaPago: "", monto: 3.00 },
+          { id: 3, fecha: "2026-11-05", deudor: "Diego", estado: "Pendiente", fechaPago: "", monto: 1.15 },
+          { id: 4, fecha: "2026-11-12", deudor: "Mamá", estado: "Pagado", fechaPago: "2026-11-15", monto: 2.50 }
+        ],
+        metas: [
+          { id: 1, nombre: "Fondo de emergencia", objetivo: 500, ahorrado: 320 },
+          { id: 2, nombre: "Laptop", objetivo: 800, ahorrado: 80 },
+          { id: 3, nombre: "Certificación", objetivo: 150, ahorrado: 30 }
+        ],
+        gastos: [
+          // Datos de ejemplo en Octubre 2026
+          { id: 11, fecha: "2026-10-06", categoria: "Alimentación", subcategoria: "Almuerzos", descripcion: "Almuerzos semana 1 octubre", tipo: "Necesario", monto: 24.50, metodo: "Efectivo" },
+          { id: 12, fecha: "2026-10-14", categoria: "Transporte", subcategoria: "Taxi / Bus", descripcion: "Movilización citas y trámites", tipo: "Necesario", monto: 16.00, metodo: "BancoMóvil" },
+          { id: 13, fecha: "2026-10-19", categoria: "Ocio y entretenimiento", subcategoria: "Salidas", descripcion: "Cine y snacks fin de semana", tipo: "Innecesario", monto: 19.50, metodo: "Deuna" },
+          { id: 14, fecha: "2026-10-25", categoria: "Alimentación", subcategoria: "Bebidas/Dulces", descripcion: "Cafés y snacks por impulso", tipo: "Innecesario", monto: 8.25, metodo: "Efectivo" },
+
+          // Datos de ejemplo en Noviembre 2026
+          { id: 21, fecha: "2026-11-07", categoria: "Electrónica", subcategoria: "Accesorios", descripcion: "Audífonos inalámbricos", tipo: "Innecesario", monto: 2.00, metodo: "Efectivo" },
+          { id: 22, fecha: "2026-11-07", categoria: "Electrónica", subcategoria: "Audio", descripcion: "Audífonos Cascos", tipo: "Innecesario", monto: 15.00, metodo: "Efectivo" },
+          { id: 23, fecha: "2026-11-07", categoria: "Electrónica", subcategoria: "Adaptador", descripcion: "Adaptador Audífono", tipo: "Necesario", monto: 5.00, metodo: "Efectivo" },
+          { id: 24, fecha: "2026-11-07", categoria: "Vestimenta", subcategoria: "Ropa", descripcion: "Medias", tipo: "Necesario", monto: 5.00, metodo: "Efectivo" },
+          { id: 25, fecha: "2026-11-11", categoria: "Telefonía", subcategoria: "Recarga", descripcion: "Recarga Claro", tipo: "Necesario", monto: 1.05, metodo: "Transferencia" },
+          { id: 26, fecha: "2026-11-11", categoria: "Salud", subcategoria: "Farmacia", descripcion: "Redoxon", tipo: "Necesario", monto: 5.90, metodo: "Efectivo" },
+          { id: 27, fecha: "2026-11-10", categoria: "Transporte", subcategoria: "Recarga", descripcion: "Recarga Movil", tipo: "Necesario", monto: 1.00, metodo: "Efectivo" },
+          { id: 28, fecha: "2026-11-10", categoria: "Alimentación", subcategoria: "Bebida", descripcion: "Coca cola", tipo: "Innecesario", monto: 0.25, metodo: "Efectivo" },
+          { id: 29, fecha: "2026-11-14", categoria: "Alimentación", subcategoria: "Bebida", descripcion: "Pulp", tipo: "Innecesario", monto: 0.50, metodo: "Efectivo" },
+          { id: 30, fecha: "2026-11-14", categoria: "Transporte", subcategoria: "Taxi", descripcion: "Taxi para Geovanny masivo", tipo: "Necesario", monto: 1.50, metodo: "Efectivo" },
+          { id: 31, fecha: "2026-11-16", categoria: "Alimentación", subcategoria: "Bebida", descripcion: "Coca cola", tipo: "Innecesario", monto: 0.25, metodo: "Efectivo" },
+          { id: 32, fecha: "2026-11-16", categoria: "Donaciones y solidaridad", subcategoria: "Ayuda", descripcion: "Regalo a persona calle", tipo: "Necesario", monto: 2.05, metodo: "Efectivo" },
+          { id: 33, fecha: "2026-11-18", categoria: "Telefonía", subcategoria: "Recarga", descripcion: "Recarga Claro", tipo: "Necesario", monto: 1.05, metodo: "Efectivo" }
+        ],
+        ingresos: [
+          { id: 51, fecha: "2026-10-05", fuente: "Trabajo", descripcion: "Pago quincenal octubre", monto: 145.00, destino: "BancoMóvil" },
+          { id: 52, fecha: "2026-10-20", fuente: "Comisiones", descripcion: "Comisión ventas octubre", monto: 35.00, destino: "Deuna" },
+          { id: 61, fecha: "2026-11-03", fuente: "Mamá", descripcion: "Comisión Luz", monto: 1.76, destino: "Efectivo" },
+          { id: 62, fecha: "2026-11-15", fuente: "Trabajo", descripcion: "Abono quincenal noviembre", monto: 65.00, destino: "BancoMóvil" }
+        ]
+      };
+    }
+
+    function normalizeState(rawObj) {
+      const def = getDefaultData();
+      if (!rawObj || typeof rawObj !== "object") return def;
+
+      const capMap = {};
+      MESES.forEach(m => {
+        const v = rawObj.capitalPorMes && Object.prototype.hasOwnProperty.call(rawObj.capitalPorMes, m)
+          ? Number(rawObj.capitalPorMes[m])
+          : Number(def.capitalPorMes[m]);
+        capMap[m] = Number.isFinite(v) ? v : 0;
+      });
+
+      return {
+        activeMes: MESES.includes(rawObj.activeMes) ? rawObj.activeMes : def.activeMes,
+        activeAnio: Number.isFinite(Number(rawObj.activeAnio)) ? Number(rawObj.activeAnio) : def.activeAnio,
+        categorias: Array.isArray(rawObj.categorias) && rawObj.categorias.length
+          ? rawObj.categorias.map(c => ({
+              nombre: String(c && c.nombre ? c.nombre : "Otros"),
+              presupuesto: Number.isFinite(Number(c && c.presupuesto)) ? Number(c.presupuesto) : 0
+            }))
+          : def.categorias,
+        metodos: Array.isArray(rawObj.metodos) && rawObj.metodos.length ? rawObj.metodos.map(String) : def.metodos,
+        fuentes: Array.isArray(rawObj.fuentes) && rawObj.fuentes.length ? rawObj.fuentes.map(String) : def.fuentes,
+        deudores: Array.isArray(rawObj.deudores) && rawObj.deudores.length ? rawObj.deudores.map(String) : def.deudores,
+        capitalPorMes: capMap,
+        arqueo: {
+          billetes: Number.isFinite(Number(rawObj.arqueo && rawObj.arqueo.billetes)) ? Number(rawObj.arqueo.billetes) : def.arqueo.billetes,
+          monedas: Number.isFinite(Number(rawObj.arqueo && rawObj.arqueo.monedas)) ? Number(rawObj.arqueo.monedas) : def.arqueo.monedas
+        },
+        cuentas: {
+          bancomovil: Number.isFinite(Number(rawObj.cuentas && rawObj.cuentas.bancomovil)) ? Number(rawObj.cuentas.bancomovil) : def.cuentas.bancomovil,
+          deuna: Number.isFinite(Number(rawObj.cuentas && rawObj.cuentas.deuna)) ? Number(rawObj.cuentas.deuna) : def.cuentas.deuna
+        },
+        prestamos: Array.isArray(rawObj.prestamos)
+          ? rawObj.prestamos.map((p, idx) => ({
+              id: p && p.id ? p.id : Date.now() + idx,
+              fecha: p && p.fecha ? String(p.fecha) : "2026-11-01",
+              deudor: p && p.deudor ? String(p.deudor) : (Array.isArray(rawObj.deudores) && rawObj.deudores[0]) || "Geovanny",
+              estado: p && p.estado === "Pagado" ? "Pagado" : "Pendiente",
+              fechaPago: p && p.fechaPago ? String(p.fechaPago) : "",
+              monto: Number.isFinite(Number(p && p.monto)) ? Number(p.monto) : 0
+            }))
+          : def.prestamos,
+        metas: Array.isArray(rawObj.metas)
+          ? rawObj.metas.map((m, idx) => ({
+              id: m && m.id ? m.id : Date.now() + idx,
+              nombre: m && m.nombre ? String(m.nombre) : `Meta ${idx + 1}`,
+              objetivo: Number.isFinite(Number(m && m.objetivo)) ? Number(m.objetivo) : 0,
+              ahorrado: Number.isFinite(Number(m && m.ahorrado)) ? Number(m.ahorrado) : 0
+            }))
+          : def.metas,
+        gastos: Array.isArray(rawObj.gastos)
+          ? rawObj.gastos.map((g, idx) => ({
+              id: g && g.id ? g.id : Date.now() + idx,
+              fecha: g && g.fecha ? String(g.fecha) : "2026-11-01",
+              categoria: g && g.categoria ? String(g.categoria) : "Otros",
+              subcategoria: g && g.subcategoria ? String(g.subcategoria) : "General",
+              descripcion: g && g.descripcion ? String(g.descripcion) : "",
+              tipo: g && g.tipo === "Innecesario" ? "Innecesario" : "Necesario",
+              monto: Number.isFinite(Number(g && g.monto)) ? Number(g.monto) : 0,
+              metodo: g && g.metodo ? String(g.metodo) : "Efectivo"
+            }))
+          : def.gastos,
+        ingresos: Array.isArray(rawObj.ingresos)
+          ? rawObj.ingresos.map((i, idx) => ({
+              id: i && i.id ? i.id : Date.now() + idx,
+              fecha: i && i.fecha ? String(i.fecha) : "2026-11-01",
+              fuente: i && i.fuente ? String(i.fuente) : "Otros",
+              descripcion: i && i.descripcion ? String(i.descripcion) : "",
+              monto: Number.isFinite(Number(i && i.monto)) ? Number(i.monto) : 0,
+              destino: i && i.destino ? String(i.destino) : "Efectivo"
+            }))
+          : def.ingresos
+      };
+    }
+
+    let appState = normalizeState(getDefaultData());
+
+    function loadAppState() {
+      try {
+        const raw = readStorageRaw();
+        if (!raw) {
+          appState = getDefaultData();
+          saveAppState();
+          return;
+        }
+        appState = normalizeState(JSON.parse(raw));
+      } catch (err) {
+        appState = getDefaultData();
+        showErrorBanner("Datos corruptos recuperados con valores por defecto: " + err.message);
+      }
+    }
+
+    function saveAppState() {
+      try {
+        writeStorageRaw(JSON.stringify(appState));
+      } catch (err) {
+        showErrorBanner("No se pudo serializar el estado: " + err.message);
+      }
+    }
+
+    // =========================================================================
+    // FUNCIONES DE FECHA, FORMATO Y NOTIFICACIÓN
+    // =========================================================================
+    function parseDateParts(dateStr) {
+      const clean = String(dateStr || "").trim();
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(clean);
+      if (!match) {
+        return { mes: "Noviembre", anio: 2026, semana: "Semana 1", dia: 1 };
+      }
+      const anio = parseInt(match[1], 10);
+      const mesIdx = parseInt(match[2], 10) - 1;
+      const dia = parseInt(match[3], 10);
+      const mes = MESES[mesIdx] || "Enero";
+      const numSem = Math.min(5, Math.max(1, Math.ceil(dia / 7)));
+      return { mes, anio, semana: `Semana ${numSem}`, dia };
+    }
+
+    function getSampleDateForPeriod(mesNombre, anioNum) {
+      const idx = MESES.indexOf(mesNombre);
+      const mesNum = String((idx >= 0 ? idx : 10) + 1).padStart(2, "0");
+      return `${anioNum}-${mesNum}-15`;
+    }
+
+    function fmtMoney(n) {
+      const val = Number(n);
+      if (!Number.isFinite(val)) return "$0.00";
+      const sign = val < 0 ? "-" : "";
+      return `${sign}$${Math.abs(val).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function fmtPct(ratio) {
+      if (!Number.isFinite(ratio)) return "0.0%";
+      return `${(ratio * 100).toFixed(1)}%`;
+    }
+
+    function notify(msg) {
+      const box = document.getElementById("toast-box");
+      if (!box) return;
+      const item = document.createElement("div");
+      item.className = "toast-msg";
+      item.textContent = msg;
+      box.appendChild(item);
+      setTimeout(() => {
+        if (item && item.parentNode) item.parentNode.removeChild(item);
+      }, 2600);
+    }
+
+    // =========================================================================
+    // NAVEGACIÓN ENTRE PESTAÑAS
+    // =========================================================================
+    function switchTab(tabId) {
+      const validTabs = ["dashboard", "gastos", "ingresos", "config", "anual"];
+      const target = validTabs.includes(tabId) ? tabId : "dashboard";
+
+      validTabs.forEach(id => {
+        const panel = document.getElementById(`panel-${id}`);
+        if (panel) panel.classList.toggle("active", id === target);
+      });
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-tab") === target);
+      });
+
+      if (target === "dashboard") renderDashboardTab();
+      if (target === "gastos") renderGastosTab();
+      if (target === "ingresos") renderIngresosTab();
+      if (target === "config") renderConfigTab();
+      if (target === "anual") renderAnualTab();
+    }
+
+    function quickAddMovement(kind) {
+      const mes = appState.activeMes;
+      const anio = appState.activeAnio;
+      const fechaSugerida = getSampleDateForPeriod(mes, anio);
+      if (kind === "gasto") {
+        switchTab("gastos");
+        const fInput = document.getElementById("g-fecha");
+        if (fInput) fInput.value = fechaSugerida;
+        const fgMes = document.getElementById("fg-mes");
+        const fgAnio = document.getElementById("fg-anio");
+        if (fgMes) fgMes.value = mes;
+        if (fgAnio) fgAnio.value = String(anio);
+        renderGastosTab();
+      } else {
+        switchTab("ingresos");
+        const iInput = document.getElementById("i-fecha");
+        if (iInput) iInput.value = fechaSugerida;
+        const fiMes = document.getElementById("fi-mes");
+        const fiAnio = document.getElementById("fi-anio");
+        if (fiMes) fiMes.value = mes;
+        if (fiAnio) fiAnio.value = String(anio);
+        renderIngresosTab();
+      }
+    }
+
+    // =========================================================================
+    // SINCRONIZACIÓN DE SELECTORES
+    // =========================================================================
+    function syncAllSelects() {
+      const dashMes = document.getElementById("dash-mes");
+      const dashAnio = document.getElementById("dash-anio");
+      if (dashMes) {
+        dashMes.innerHTML = MESES.map(m => `<option value="${m}">${m}</option>`).join("");
+        dashMes.value = appState.activeMes;
+      }
+      if (dashAnio) {
+        dashAnio.value = String(appState.activeAnio);
+      }
+
+      const anualAnio = document.getElementById("anual-anio");
+      if (anualAnio) {
+        anualAnio.value = String(appState.activeAnio);
+      }
+
+      const catOpts = appState.categorias.map(c => `<option value="${escapeAttr(c.nombre)}">${escapeHtml(c.nombre)}</option>`).join("");
+      const gCat = document.getElementById("g-categoria");
+      const fgCat = document.getElementById("fg-categoria");
+      if (gCat) gCat.innerHTML = catOpts;
+      if (fgCat) fgCat.innerHTML = `<option value="">Todas las Categorías</option>` + catOpts;
+
+      const metOpts = appState.metodos.map(m => `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join("");
+      const gMet = document.getElementById("g-metodo");
+      const iDest = document.getElementById("i-destino");
+      if (gMet) gMet.innerHTML = metOpts;
+      if (iDest) iDest.innerHTML = metOpts;
+
+      const fueOpts = appState.fuentes.map(f => `<option value="${escapeAttr(f)}">${escapeHtml(f)}</option>`).join("");
+      const iFue = document.getElementById("i-fuente");
+      const fiFue = document.getElementById("fi-fuente");
+      if (iFue) iFue.innerHTML = fueOpts;
+      if (fiFue) fiFue.innerHTML = `<option value="">Todas las Fuentes</option>` + fueOpts;
+
+      const mesFilterOpts = `<option value="">Todos los Meses</option>` + MESES.map(m => `<option value="${m}">${m}</option>`).join("");
+      const fgMes = document.getElementById("fg-mes");
+      const fiMes = document.getElementById("fi-mes");
+      if (fgMes) {
+        const prev = fgMes.value;
+        fgMes.innerHTML = mesFilterOpts;
+        fgMes.value = prev;
+      }
+      if (fiMes) {
+        const prev = fiMes.value;
+        fiMes.innerHTML = mesFilterOpts;
+        fiMes.value = prev;
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, "&#39;");
+    }
+
+    // =========================================================================
+    // PESTAÑA 1: RESUMEN DASHBOARD
+    // =========================================================================
+    function onDashboardPeriodChange() {
+      const dashMes = document.getElementById("dash-mes");
+      const dashAnio = document.getElementById("dash-anio");
+      if (dashMes && MESES.includes(dashMes.value)) {
+        appState.activeMes = dashMes.value;
+      }
+      if (dashAnio) {
+        const y = parseInt(dashAnio.value, 10);
+        if (Number.isFinite(y)) appState.activeAnio = y;
+      }
+      saveAppState();
+      renderDashboardTab();
+    }
+
+    function getMonthSummary(mes, anio) {
+      const gastosMes = appState.gastos.filter(g => {
+        const p = parseDateParts(g.fecha);
+        return p.mes === mes && p.anio === anio;
+      });
+      const ingresosMes = appState.ingresos.filter(i => {
+        const p = parseDateParts(i.fecha);
+        return p.mes === mes && p.anio === anio;
+      });
+
+      const totalIngresos = ingresosMes.reduce((s, x) => s + (Number(x.monto) || 0), 0);
+      const totalGastos = gastosMes.reduce((s, x) => s + (Number(x.monto) || 0), 0);
+      const gastoNecesario = gastosMes.filter(x => x.tipo === "Necesario").reduce((s, x) => s + (Number(x.monto) || 0), 0);
+      const gastoInnecesario = gastosMes.filter(x => x.tipo === "Innecesario").reduce((s, x) => s + (Number(x.monto) || 0), 0);
+      const ahorroNeto = totalIngresos - totalGastos;
+      const capitalInicial = Number(appState.capitalPorMes[mes] || 0);
+      const capitalActual = capitalInicial + ahorroNeto;
+      const pctAhorro = totalIngresos > 0 ? (ahorroNeto / totalIngresos) : 0;
+
+      return {
+        gastosMes,
+        ingresosMes,
+        totalIngresos,
+        totalGastos,
+        gastoNecesario,
+        gastoInnecesario,
+        ahorroNeto,
+        capitalInicial,
+        capitalActual,
+        pctAhorro
+      };
+    }
+
+    function renderDashboardTab() {
+      const mes = appState.activeMes;
+      const anio = appState.activeAnio;
+      const sum = getMonthSummary(mes, anio);
+
+      const mesLbl = document.getElementById("dash-cap-mes-label");
+      const capIniEl = document.getElementById("dash-cap-inicial");
+      const contEl = document.getElementById("dash-contador");
+
+      if (mesLbl) mesLbl.textContent = mes;
+      if (capIniEl) capIniEl.textContent = fmtMoney(sum.capitalInicial);
+      if (contEl) {
+        const nMovs = sum.gastosMes.length + sum.ingresosMes.length;
+        contEl.textContent = `${nMovs} movimiento${nMovs === 1 ? "" : "s"} en ${mes} ${anio} (${sum.ingresosMes.length} ing. / ${sum.gastosMes.length} gas.)`;
+      }
+
+      // 6 KPIs
+      setText("kpi-capital-actual", fmtMoney(sum.capitalActual));
+      setText("kpi-ingresos", fmtMoney(sum.totalIngresos));
+      setText("kpi-gastos", fmtMoney(sum.totalGastos));
+      const ahorroEl = document.getElementById("kpi-ahorro-neto");
+      if (ahorroEl) {
+        ahorroEl.textContent = fmtMoney(sum.ahorroNeto);
+        ahorroEl.style.color = sum.ahorroNeto >= 0 ? "var(--emerald)" : "var(--rose)";
+      }
+      setText("kpi-innecesario", fmtMoney(sum.gastoInnecesario));
+      setText("kpi-pct-ahorro", fmtPct(sum.pctAhorro));
+
+      // Tabla Categorías y Presupuesto
+      const tbodyCat = document.getElementById("tbody-dash-categorias");
+      const tfootCat = document.getElementById("tfoot-dash-categorias");
+      let totalPresup = 0;
+      const catNames = [];
+      const catSpentList = [];
+
+      if (tbodyCat) {
+        tbodyCat.innerHTML = appState.categorias.map((cat, idx) => {
+          const presup = Number(cat.presupuesto) || 0;
+          totalPresup += presup;
+          const gastado = sum.gastosMes
+            .filter(g => g.categoria === cat.nombre)
+            .reduce((acc, g) => acc + (Number(g.monto) || 0), 0);
+
+          catNames.push(cat.nombre);
+          catSpentList.push(gastado);
+
+          const ratioPresup = presup > 0 ? (gastado / presup) : 0;
+          const ratioTotal = sum.totalGastos > 0 ? (gastado / sum.totalGastos) : 0;
+
+          let badgeCls = "badge-ok";
+          if (presup > 0 && ratioPresup > 1) badgeCls = "badge-over";
+          else if (presup > 0 && ratioPresup >= 0.8) badgeCls = "badge-warn";
+
+          const pctLabel = presup > 0 ? fmtPct(ratioPresup) : (gastado > 0 ? "Sin presup." : "0.0%");
+
+          return `
+            <tr>
+              <td><strong>${escapeHtml(cat.nombre)}</strong></td>
+              <td class="right">
+                <input type="number" step="1" min="0" value="${presup}" class="num" style="width: 84px; text-align: right;"
+                  onchange="updateCategoryBudget(${idx}, this.value)" />
+              </td>
+              <td class="right num" style="font-weight: 700;">${fmtMoney(gastado)}</td>
+              <td class="center"><span class="badge ${badgeCls} num">${pctLabel}</span></td>
+              <td class="right num">${fmtPct(ratioTotal)}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      if (tfootCat) {
+        const totalRatioPresup = totalPresup > 0 ? fmtPct(sum.totalGastos / totalPresup) : "—";
+        tfootCat.innerHTML = `
+          <tr>
+            <td>TOTAL GENERAL (${mes} ${anio})</td>
+            <td class="right num">${fmtMoney(totalPresup)}</td>
+            <td class="right num" style="color: #2dd4bf;">${fmtMoney(sum.totalGastos)}</td>
+            <td class="center num">${totalRatioPresup}</td>
+            <td class="right num">100.0%</td>
+          </tr>
+        `;
+      }
+
+      // Tabla Calidad del Gasto
+      const tbodyCal = document.getElementById("tbody-dash-calidad");
+      const rNec = sum.totalGastos > 0 ? (sum.gastoNecesario / sum.totalGastos) : 0;
+      const rInn = sum.totalGastos > 0 ? (sum.gastoInnecesario / sum.totalGastos) : 0;
+      if (tbodyCal) {
+        tbodyCal.innerHTML = `
+          <tr>
+            <td><span class="badge badge-ok">Necesario</span></td>
+            <td class="right num" style="font-weight: 700;">${fmtMoney(sum.gastoNecesario)}</td>
+            <td class="right num">${fmtPct(rNec)}</td>
+            <td>Gastos esenciales para el mes</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-over">Innecesario</span></td>
+            <td class="right num" style="font-weight: 700; color: var(--rose);">${fmtMoney(sum.gastoInnecesario)}</td>
+            <td class="right num">${fmtPct(rInn)}</td>
+            <td>Potencial ahorro si se evita este rubro</td>
+          </tr>
+        `;
+      }
+
+      const diagEl = document.getElementById("diagnostico-calidad");
+      setText("chart-cat-sub", `${mes} ${anio} • ${sum.gastosMes.length} gastos`);
+      setText("chart-cal-sub", `${mes} ${anio} • Ahorro evitable: ${fmtMoney(sum.gastoInnecesario)}`);
+      if (diagEl) {
+        if (sum.totalGastos <= 0) {
+          diagEl.textContent = `Sin gastos registrados en ${mes} ${anio}.`;
+        } else {
+          diagEl.textContent = `En ${mes} ${anio}, el ${fmtPct(rInn)} (${fmtMoney(sum.gastoInnecesario)}) fue innecesario y el ${fmtPct(rNec)} (${fmtMoney(sum.gastoNecesario)}) fue necesario.`;
+        }
+      }
+
+      renderMetasTable();
+      renderArqueoCuentasYPrestamos();
+
+      drawBarChart("canvas-categorias", catNames, catSpentList, "#0d9488", `${mes} ${anio}`);
+      drawDonutChart("canvas-calidad", ["Necesario", "Innecesario"], [sum.gastoNecesario, sum.gastoInnecesario], ["#059669", "#e11d48"]);
+    }
+
+    function setText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+
+    function updateCategoryBudget(idx, val) {
+      if (!appState.categorias[idx]) return;
+      const num = parseFloat(val);
+      appState.categorias[idx].presupuesto = Number.isFinite(num) && num >= 0 ? num : 0;
+      saveAppState();
+      renderDashboardTab();
+      notify("Presupuesto actualizado");
+    }
+
+    function renderMetasTable() {
+      const tbody = document.getElementById("tbody-metas");
+      if (!tbody) return;
+      tbody.innerHTML = appState.metas.map((m, idx) => {
+        const obj = Number(m.objetivo) || 0;
+        const aho = Number(m.ahorrado) || 0;
+        const falta = Math.max(0, obj - aho);
+        const pct = obj > 0 ? Math.min(1, Math.max(0, aho / obj)) : 0;
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(m.nombre)}</strong></td>
+            <td class="right">
+              <input type="number" step="1" min="0" value="${obj}" class="num" style="width: 82px; text-align: right;"
+                onchange="updateMeta(${idx}, 'objetivo', this.value)" />
+            </td>
+            <td class="right">
+              <input type="number" step="1" min="0" value="${aho}" class="num" style="width: 82px; text-align: right;"
+                onchange="updateMeta(${idx}, 'ahorrado', this.value)" />
+            </td>
+            <td class="right num">${fmtMoney(falta)}</td>
+            <td>
+              <div class="progress-bar"><div class="progress-fill" style="width: ${(pct * 100).toFixed(0)}%;"></div></div>
+              <span class="num" style="font-size: 12px; font-weight: 700;">${fmtPct(pct)}</span>
+            </td>
+            <td class="center">
+              <button type="button" class="btn btn-danger-soft btn-sm" onclick="deleteMeta(${idx})">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function updateMeta(idx, field, val) {
+      if (!appState.metas[idx]) return;
+      const num = parseFloat(val);
+      appState.metas[idx][field] = Number.isFinite(num) && num >= 0 ? num : 0;
+      saveAppState();
+      renderMetasTable();
+    }
+
+    function addMeta() {
+      appState.metas.push({
+        id: Date.now(),
+        nombre: `Meta ${appState.metas.length + 1}`,
+        objetivo: 200,
+        ahorrado: 0
+      });
+      saveAppState();
+      renderMetasTable();
+      notify("Nueva meta agregada");
+    }
+
+    function deleteMeta(idx) {
+      appState.metas.splice(idx, 1);
+      saveAppState();
+      renderMetasTable();
+    }
+
+    function renderArqueoCuentasYPrestamos() {
+      const bil = Number(appState.arqueo.billetes) || 0;
+      const mon = Number(appState.arqueo.monedas) || 0;
+      const totEfec = bil + mon;
+
+      const inpBil = document.getElementById("arq-billetes");
+      const inpMon = document.getElementById("arq-monedas");
+      const inpBan = document.getElementById("lug-bancomovil");
+      const inpDeu = document.getElementById("lug-deuna");
+
+      if (inpBil) inpBil.value = bil.toFixed(2);
+      if (inpMon) inpMon.value = mon.toFixed(2);
+      setText("arq-total-box", fmtMoney(totEfec));
+      setText("lug-efectivo", fmtMoney(totEfec));
+
+      const ban = Number(appState.cuentas.bancomovil) || 0;
+      const deu = Number(appState.cuentas.deuna) || 0;
+      if (inpBan) inpBan.value = ban.toFixed(2);
+      if (inpDeu) inpDeu.value = deu.toFixed(2);
+
+      // Deudores: suma solo Pendientes
+      let totalPendiente = 0;
+      const tbodyP = document.getElementById("tbody-prestamos");
+      if (tbodyP) {
+        tbodyP.innerHTML = appState.prestamos.map((p, idx) => {
+          const monto = Number(p.monto) || 0;
+          if (p.estado === "Pendiente") totalPendiente += monto;
+
+          const deudorOpts = appState.deudores.map(d =>
+            `<option value="${escapeAttr(d)}" ${d === p.deudor ? "selected" : ""}>${escapeHtml(d)}</option>`
+          ).join("");
+
+          return `
+            <tr>
+              <td>
+                <input type="date" value="${escapeAttr(p.fecha || "")}" style="width: 132px;"
+                  onchange="updatePrestamo(${idx}, 'fecha', this.value)" />
+              </td>
+              <td>
+                <select onchange="updatePrestamo(${idx}, 'deudor', this.value)">
+                  ${deudorOpts}
+                </select>
+              </td>
+              <td>
+                <select onchange="updatePrestamo(${idx}, 'estado', this.value)" style="font-weight: 700;">
+                  <option value="Pendiente" ${p.estado === "Pendiente" ? "selected" : ""}>Pendiente</option>
+                  <option value="Pagado" ${p.estado === "Pagado" ? "selected" : ""}>Pagado</option>
+                </select>
+                <div style="margin-top: 4px; font-size: 11px; color: var(--muted);">
+                  ${p.estado === "Pagado" ? "Pagado el:" : "Registro/Abono:"}
+                  <input type="date" value="${escapeAttr(p.fechaPago || "")}" style="width: 124px; padding: 3px 6px; font-size: 11px;"
+                    onchange="updatePrestamo(${idx}, 'fechaPago', this.value)" />
+                </div>
+              </td>
+              <td class="right">
+                <input type="number" step="0.01" min="0" value="${monto.toFixed(2)}" class="num" style="width: 82px; text-align: right;"
+                  onchange="updatePrestamo(${idx}, 'monto', this.value)" />
+              </td>
+              <td class="center">
+                <button type="button" class="btn btn-danger-soft btn-sm" onclick="deletePrestamo(${idx})">✕</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      setText("total-por-cobrar-foot", fmtMoney(totalPendiente));
+      setText("lug-por-cobrar", fmtMoney(totalPendiente));
+      setText("lug-total-patrimonio", fmtMoney(totEfec + ban + deu + totalPendiente));
+    }
+
+    function updateArqueo() {
+      const b = parseFloat(document.getElementById("arq-billetes").value);
+      const m = parseFloat(document.getElementById("arq-monedas").value);
+      appState.arqueo.billetes = Number.isFinite(b) && b >= 0 ? b : 0;
+      appState.arqueo.monedas = Number.isFinite(m) && m >= 0 ? m : 0;
+      saveAppState();
+      renderArqueoCuentasYPrestamos();
+      notify("Arqueo de efectivo actualizado");
+    }
+
+    function updateCuentas() {
+      const b = parseFloat(document.getElementById("lug-bancomovil").value);
+      const d = parseFloat(document.getElementById("lug-deuna").value);
+      appState.cuentas.bancomovil = Number.isFinite(b) ? b : 0;
+      appState.cuentas.deuna = Number.isFinite(d) ? d : 0;
+      saveAppState();
+      renderArqueoCuentasYPrestamos();
+      notify("Cuentas actualizadas");
+    }
+
+    function updatePrestamo(idx, field, val) {
+      if (!appState.prestamos[idx]) return;
+      if (field === "monto") {
+        const num = parseFloat(val);
+        appState.prestamos[idx].monto = Number.isFinite(num) && num >= 0 ? num : 0;
+      } else {
+        appState.prestamos[idx][field] = val;
+        if (field === "estado" && val === "Pagado" && !appState.prestamos[idx].fechaPago) {
+          appState.prestamos[idx].fechaPago = new Date().toISOString().slice(0, 10);
+        }
+      }
+      saveAppState();
+      renderArqueoCuentasYPrestamos();
+      notify("Préstamo actualizado");
+    }
+
+    function addPrestamo() {
+      const fechaDef = getSampleDateForPeriod(appState.activeMes, appState.activeAnio);
+      appState.prestamos.unshift({
+        id: Date.now(),
+        fecha: fechaDef,
+        deudor: appState.deudores[0] || "Geovanny",
+        estado: "Pendiente",
+        fechaPago: "",
+        monto: 0
+      });
+      saveAppState();
+      renderArqueoCuentasYPrestamos();
+      notify("Nuevo préstamo agregado");
+    }
+
+    function deletePrestamo(idx) {
+      appState.prestamos.splice(idx, 1);
+      saveAppState();
+      renderArqueoCuentasYPrestamos();
+    }
+
+    // =========================================================================
+    // PESTAÑA 2: GASTOS
+    // =========================================================================
+    function handleSaveGasto(e) {
+      e.preventDefault();
+      const fecha = document.getElementById("g-fecha").value;
+      const categoria = document.getElementById("g-categoria").value;
+      const subcategoria = document.getElementById("g-subcategoria").value.trim() || "General";
+      const descripcion = document.getElementById("g-descripcion").value.trim();
+      const tipo = document.getElementById("g-tipo").value === "Innecesario" ? "Innecesario" : "Necesario";
+      const monto = parseFloat(document.getElementById("g-monto").value);
+      const metodo = document.getElementById("g-metodo").value;
+
+      if (!fecha || !descripcion || !Number.isFinite(monto) || monto <= 0) return;
+
+      appState.gastos.unshift({
+        id: Date.now(),
+        fecha,
+        categoria,
+        subcategoria,
+        descripcion,
+        tipo,
+        monto,
+        metodo
+      });
+
+      saveAppState();
+      document.getElementById("g-subcategoria").value = "";
+      document.getElementById("g-descripcion").value = "";
+      document.getElementById("g-monto").value = "";
+      renderGastosTab();
+      renderDashboardTab();
+      notify("Gasto guardado");
+    }
+
+    function deleteGasto(id) {
+      appState.gastos = appState.gastos.filter(g => g.id !== id);
+      saveAppState();
+      renderGastosTab();
+      renderDashboardTab();
+      notify("Gasto eliminado");
+    }
+
+    function resetGastoFilters() {
+      document.getElementById("fg-mes").value = "";
+      document.getElementById("fg-anio").value = "";
+      document.getElementById("fg-categoria").value = "";
+      document.getElementById("fg-tipo").value = "";
+      document.getElementById("fg-buscar").value = "";
+      renderGastosTab();
+    }
+
+    function renderGastosTab() {
+      const fMes = document.getElementById("fg-mes").value;
+      const fAnio = document.getElementById("fg-anio").value;
+      const fCat = document.getElementById("fg-categoria").value;
+      const fTipo = document.getElementById("fg-tipo").value;
+      const fBus = (document.getElementById("fg-buscar").value || "").toLowerCase().trim();
+
+      const filtered = appState.gastos.filter(g => {
+        const p = parseDateParts(g.fecha);
+        if (fMes && p.mes !== fMes) return false;
+        if (fAnio && String(p.anio) !== fAnio) return false;
+        if (fCat && g.categoria !== fCat) return false;
+        if (fTipo && g.tipo !== fTipo) return false;
+        if (fBus && !`${g.descripcion} ${g.subcategoria} ${g.categoria} ${g.metodo}`.toLowerCase().includes(fBus)) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById("tbody-gastos");
+      const tfoot = document.getElementById("tfoot-gastos");
+      let total = 0;
+
+      if (tbody) {
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="11" class="center" style="padding: 18px; color: var(--muted);">Sin gastos para los filtros aplicados.</td></tr>`;
+        } else {
+          tbody.innerHTML = filtered.map(g => {
+            const p = parseDateParts(g.fecha);
+            const m = Number(g.monto) || 0;
+            total += m;
+            const tipoBadge = g.tipo === "Necesario"
+              ? `<span class="badge badge-ok">Necesario</span>`
+              : `<span class="badge badge-over">Innecesario</span>`;
+            return `
+              <tr>
+                <td class="num">${escapeHtml(g.fecha)}</td>
+                <td>${escapeHtml(p.mes)}</td>
+                <td class="num">${p.anio}</td>
+                <td>${escapeHtml(p.semana)}</td>
+                <td><strong>${escapeHtml(g.categoria)}</strong></td>
+                <td>${escapeHtml(g.subcategoria)}</td>
+                <td>${escapeHtml(g.descripcion)}</td>
+                <td class="center">${tipoBadge}</td>
+                <td class="right num" style="font-weight: 700;">${fmtMoney(m)}</td>
+                <td>${escapeHtml(g.metodo)}</td>
+                <td class="center"><button type="button" class="btn btn-danger-soft btn-sm" onclick="deleteGasto(${g.id})">✕</button></td>
+              </tr>
+            `;
+          }).join("");
+        }
+      }
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr>
+            <td colspan="8" class="right">Total Filtrado (${filtered.length} registros):</td>
+            <td class="right num" style="color: var(--rose);">${fmtMoney(total)}</td>
+            <td colspan="2"></td>
+          </tr>
+        `;
+      }
+    }
+
+    // =========================================================================
+    // PESTAÑA 3: INGRESOS
+    // =========================================================================
+    function handleSaveIngreso(e) {
+      e.preventDefault();
+      const fecha = document.getElementById("i-fecha").value;
+      const fuente = document.getElementById("i-fuente").value;
+      const descripcion = document.getElementById("i-descripcion").value.trim();
+      const monto = parseFloat(document.getElementById("i-monto").value);
+      const destino = document.getElementById("i-destino").value;
+
+      if (!fecha || !descripcion || !Number.isFinite(monto) || monto <= 0) return;
+
+      appState.ingresos.unshift({
+        id: Date.now(),
+        fecha,
+        fuente,
+        descripcion,
+        monto,
+        destino
+      });
+
+      saveAppState();
+      document.getElementById("i-descripcion").value = "";
+      document.getElementById("i-monto").value = "";
+      renderIngresosTab();
+      renderDashboardTab();
+      notify("Ingreso guardado");
+    }
+
+    function deleteIngreso(id) {
+      appState.ingresos = appState.ingresos.filter(i => i.id !== id);
+      saveAppState();
+      renderIngresosTab();
+      renderDashboardTab();
+      notify("Ingreso eliminado");
+    }
+
+    function resetIngresoFilters() {
+      document.getElementById("fi-mes").value = "";
+      document.getElementById("fi-anio").value = "";
+      document.getElementById("fi-fuente").value = "";
+      document.getElementById("fi-buscar").value = "";
+      renderIngresosTab();
+    }
+
+    function renderIngresosTab() {
+      const fMes = document.getElementById("fi-mes").value;
+      const fAnio = document.getElementById("fi-anio").value;
+      const fFue = document.getElementById("fi-fuente").value;
+      const fBus = (document.getElementById("fi-buscar").value || "").toLowerCase().trim();
+
+      const filtered = appState.ingresos.filter(i => {
+        const p = parseDateParts(i.fecha);
+        if (fMes && p.mes !== fMes) return false;
+        if (fAnio && String(p.anio) !== fAnio) return false;
+        if (fFue && i.fuente !== fFue) return false;
+        if (fBus && !`${i.descripcion} ${i.fuente} ${i.destino}`.toLowerCase().includes(fBus)) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById("tbody-ingresos");
+      const tfoot = document.getElementById("tfoot-ingresos");
+      let total = 0;
+
+      if (tbody) {
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" class="center" style="padding: 18px; color: var(--muted);">Sin ingresos para los filtros aplicados.</td></tr>`;
+        } else {
+          tbody.innerHTML = filtered.map(i => {
+            const p = parseDateParts(i.fecha);
+            const m = Number(i.monto) || 0;
+            total += m;
+            return `
+              <tr>
+                <td class="num">${escapeHtml(i.fecha)}</td>
+                <td>${escapeHtml(p.mes)}</td>
+                <td class="num">${p.anio}</td>
+                <td><span class="badge badge-ok">${escapeHtml(i.fuente)}</span></td>
+                <td>${escapeHtml(i.descripcion)}</td>
+                <td class="right num" style="font-weight: 700; color: var(--emerald);">${fmtMoney(m)}</td>
+                <td>${escapeHtml(i.destino)}</td>
+                <td class="center"><button type="button" class="btn btn-danger-soft btn-sm" onclick="deleteIngreso(${i.id})">✕</button></td>
+              </tr>
+            `;
+          }).join("");
+        }
+      }
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr>
+            <td colspan="5" class="right">Total Filtrado (${filtered.length} registros):</td>
+            <td class="right num" style="color: var(--emerald);">${fmtMoney(total)}</td>
+            <td colspan="2"></td>
+          </tr>
+        `;
+      }
+    }
+
+    // =========================================================================
+    // PESTAÑA 4: CONFIG LISTAS
+    // =========================================================================
+    function renderConfigTab() {
+      const tbodyCat = document.getElementById("tbody-cfg-categorias");
+      if (tbodyCat) {
+        tbodyCat.innerHTML = appState.categorias.map((c, idx) => `
+          <tr>
+            <td><strong>${escapeHtml(c.nombre)}</strong></td>
+            <td class="right">
+              <input type="number" step="1" min="0" value="${Number(c.presupuesto) || 0}" class="num" style="width: 90px; text-align: right;"
+                onchange="updateCategoryBudget(${idx}, this.value)" />
+            </td>
+            <td class="center">
+              <button type="button" class="btn btn-danger-soft btn-sm" onclick="removeCategoria(${idx})">✕</button>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      const tbodyCap = document.getElementById("tbody-cfg-capital-mes");
+      if (tbodyCap) {
+        tbodyCap.innerHTML = MESES.map(m => `
+          <tr>
+            <td><strong>${m}</strong></td>
+            <td class="right">
+              <input type="number" step="0.01" value="${(Number(appState.capitalPorMes[m]) || 0).toFixed(2)}" class="num" style="width: 110px; text-align: right;"
+                onchange="updateCapitalMes('${m}', this.value)" />
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      renderChips("deudores", "chips-deudores");
+      renderChips("metodos", "chips-metodos");
+      renderChips("fuentes", "chips-fuentes");
+    }
+
+    function renderChips(listKey, containerId) {
+      const el = document.getElementById(containerId);
+      if (!el || !Array.isArray(appState[listKey])) return;
+      el.innerHTML = appState[listKey].map((item, idx) => `
+        <span class="chip">
+          ${escapeHtml(item)}
+          <button type="button" title="Quitar" onclick="removeListItem('${listKey}', ${idx})">×</button>
+        </span>
+      `).join("");
+    }
+
+    function addCategoria() {
+      const nameInput = document.getElementById("cfg-cat-nombre");
+      const budgetInput = document.getElementById("cfg-cat-presup");
+      const nombre = (nameInput.value || "").trim();
+      const presupuesto = parseFloat(budgetInput.value);
+      if (!nombre) return;
+      if (!appState.categorias.some(c => c.nombre.toLowerCase() === nombre.toLowerCase())) {
+        appState.categorias.push({
+          nombre,
+          presupuesto: Number.isFinite(presupuesto) && presupuesto >= 0 ? presupuesto : 0
+        });
+        saveAppState();
+        syncAllSelects();
+        renderConfigTab();
+        renderDashboardTab();
+        notify(`Categoría "${nombre}" agregada`);
+      }
+      nameInput.value = "";
+      budgetInput.value = "";
+    }
+
+    function removeCategoria(idx) {
+      if (appState.categorias.length <= 1) return;
+      appState.categorias.splice(idx, 1);
+      saveAppState();
+      syncAllSelects();
+      renderConfigTab();
+      renderDashboardTab();
+    }
+
+    function addSimpleListItem(listKey, inputId) {
+      const inp = document.getElementById(inputId);
+      const val = (inp.value || "").trim();
+      if (!val || !Array.isArray(appState[listKey])) return;
+      if (!appState[listKey].includes(val)) {
+        appState[listKey].push(val);
+        saveAppState();
+        syncAllSelects();
+        renderConfigTab();
+        renderArqueoCuentasYPrestamos();
+        notify(`"${val}" agregado`);
+      }
+      inp.value = "";
+    }
+
+    function removeListItem(listKey, idx) {
+      if (!Array.isArray(appState[listKey]) || appState[listKey].length <= 1) return;
+      appState[listKey].splice(idx, 1);
+      saveAppState();
+      syncAllSelects();
+      renderConfigTab();
+      renderArqueoCuentasYPrestamos();
+    }
+
+    function updateCapitalMes(mes, val) {
+      if (!MESES.includes(mes)) return;
+      const num = parseFloat(val);
+      appState.capitalPorMes[mes] = Number.isFinite(num) ? num : 0;
+      saveAppState();
+      renderDashboardTab();
+      notify(`Capital inicial de ${mes} actualizado`);
+    }
+
+    function resetDemoData() {
+      appState = getDefaultData();
+      saveAppState();
+      syncAllSelects();
+      renderAllTabs();
+      notify("Datos de ejemplo restablecidos");
+    }
+
+    // =========================================================================
+    // PESTAÑA 5: RESUMEN ANUAL
+    // =========================================================================
+    function renderAnualTab() {
+      const sel = document.getElementById("anual-anio");
+      const anio = sel ? (parseInt(sel.value, 10) || 2026) : appState.activeAnio;
+
+      const tbody = document.getElementById("tbody-anual");
+      const tfoot = document.getElementById("tfoot-anual");
+
+      let sumIng = 0;
+      let sumGas = 0;
+      let sumNec = 0;
+      let sumInn = 0;
+      let sumAho = 0;
+      const ingresosMensuales = [];
+      const gastosMensuales = [];
+
+      if (tbody) {
+        tbody.innerHTML = MESES.map(mes => {
+          const s = getMonthSummary(mes, anio);
+          const capCierre = s.capitalInicial + s.ahorroNeto;
+
+          sumIng += s.totalIngresos;
+          sumGas += s.totalGastos;
+          sumNec += s.gastoNecesario;
+          sumInn += s.gastoInnecesario;
+          sumAho += s.ahorroNeto;
+
+          ingresosMensuales.push(s.totalIngresos);
+          gastosMensuales.push(s.totalGastos);
+
+          return `
+            <tr>
+              <td><strong>${mes}</strong></td>
+              <td class="right num">${fmtMoney(s.capitalInicial)}</td>
+              <td class="right num" style="color: var(--emerald); font-weight: 700;">${fmtMoney(s.totalIngresos)}</td>
+              <td class="right num" style="color: var(--rose); font-weight: 700;">${fmtMoney(s.totalGastos)}</td>
+              <td class="right num">${fmtMoney(s.gastoNecesario)}</td>
+              <td class="right num" style="color: var(--amber);">${fmtMoney(s.gastoInnecesario)}</td>
+              <td class="right num" style="font-weight: 700; color: ${s.ahorroNeto >= 0 ? "var(--emerald)" : "var(--rose)"};">${fmtMoney(s.ahorroNeto)}</td>
+              <td class="right num">${fmtPct(s.pctAhorro)}</td>
+              <td class="right num" style="font-weight: 800;">${fmtMoney(capCierre)}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      if (tfoot) {
+        const pctAnual = sumIng > 0 ? (sumAho / sumIng) : 0;
+        const capDic = (Number(appState.capitalPorMes["Diciembre"]) || 0) + ((ingresosMensuales[11] || 0) - (gastosMensuales[11] || 0));
+        tfoot.innerHTML = `
+          <tr>
+            <td>TOTAL ANUAL ${anio}</td>
+            <td class="right">—</td>
+            <td class="right num" style="color: #6ee7b7;">${fmtMoney(sumIng)}</td>
+            <td class="right num" style="color: #fda4af;">${fmtMoney(sumGas)}</td>
+            <td class="right num">${fmtMoney(sumNec)}</td>
+            <td class="right num" style="color: #fcd34d;">${fmtMoney(sumInn)}</td>
+            <td class="right num" style="color: #2dd4bf;">${fmtMoney(sumAho)}</td>
+            <td class="right num">${fmtPct(pctAnual)}</td>
+            <td class="right num" style="color: #2dd4bf;">${fmtMoney(capDic)}</td>
+          </tr>
+        `;
+      }
+
+      drawGroupedAnnualChart("canvas-anual", MESES.map(m => m.slice(0, 3)), ingresosMensuales, gastosMensuales);
+    }
+
+    // =========================================================================
+    // GRÁFICOS NATIVOS EN CANVAS (Sin dependencia de red)
+    // =========================================================================
+    function prepareCanvas(canvasId, heightPx) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      const parentWidth = canvas.parentElement && canvas.parentElement.clientWidth ? canvas.parentElement.clientWidth : 600;
+      const width = Math.max(280, parentWidth - 4);
+      const height = heightPx || canvas.height || 240;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+      return { ctx, width, height };
+    }
+
+    function drawBarChart(canvasId, labels, values, colorHex, titleTag) {
+      const info = prepareCanvas(canvasId, 280);
+      if (!info) return;
+      const { ctx, width, height } = info;
+
+      const padLeft = 148;
+      const padRight = 56;
+      const padTop = 18;
+      const padBottom = 26;
+      const plotW = Math.max(80, width - padLeft - padRight);
+      const plotH = Math.max(80, height - padTop - padBottom);
+
+      const maxVal = Math.max(1, ...values.map(v => Number(v) || 0));
+      const rowH = plotH / Math.max(1, labels.length);
+
+      ctx.font = "11px sans-serif";
+      ctx.textBaseline = "middle";
+
+      for (let i = 0; i < labels.length; i++) {
+        const val = Number(values[i]) || 0;
+        const yCenter = padTop + i * rowH + rowH / 2;
+        const barW = Math.max(0, (val / maxVal) * plotW);
+        const barH = Math.max(6, Math.min(15, rowH * 0.62));
+
+        ctx.fillStyle = "#334155";
+        ctx.textAlign = "right";
+        const shortLabel = labels[i].length > 21 ? labels[i].slice(0, 20) + "…" : labels[i];
+        ctx.fillText(shortLabel, padLeft - 8, yCenter);
+
+        ctx.fillStyle = "#f1f5f9";
+        ctx.fillRect(padLeft, yCenter - barH / 2, plotW, barH);
+
+        ctx.fillStyle = colorHex;
+        ctx.fillRect(padLeft, yCenter - barH / 2, barW, barH);
+
+        ctx.fillStyle = "#0f172a";
+        ctx.textAlign = "left";
+        ctx.fillText(`$${val.toFixed(2)}`, padLeft + barW + 6, yCenter);
+      }
+
+      ctx.fillStyle = "#64748b";
+      ctx.textAlign = "right";
+      ctx.fillText(`Escala máx: $${maxVal.toFixed(0)} (${titleTag})`, width - 8, height - 8);
+    }
+
+    function drawDonutChart(canvasId, labels, values, colors) {
+      const info = prepareCanvas(canvasId, 210);
+      if (!info) return;
+      const { ctx, width, height } = info;
+
+      const total = values.reduce((a, b) => a + (Number(b) || 0), 0);
+      const cx = width * 0.36;
+      const cy = height * 0.5;
+      const rOuter = Math.max(36, Math.min(cx - 14, cy - 14));
+      const rInner = rOuter * 0.58;
+
+      if (total <= 0) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+        ctx.fillStyle = "#e2e8f0";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.fillStyle = "#64748b";
+        ctx.font = "bold 12px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Sin gastos", cx, cy + 4);
+        return;
+      }
+
+      let startAngle = -Math.PI / 2;
+      values.forEach((v, idx) => {
+        const val = Number(v) || 0;
+        const slice = (val / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, rOuter, startAngle, startAngle + slice);
+        ctx.closePath();
+        ctx.fillStyle = colors[idx] || "#0d9488";
+        ctx.fill();
+        startAngle += slice;
+      });
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+
+      // Leyenda a la derecha
+      const legX = cx + rOuter + 18;
+      let legY = cy - 22;
+      ctx.textAlign = "left";
+      labels.forEach((lbl, idx) => {
+        const val = Number(values[idx]) || 0;
+        const pct = ((val / total) * 100).toFixed(1);
+        ctx.fillStyle = colors[idx] || "#0d9488";
+        ctx.fillRect(legX, legY - 5, 11, 11);
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillText(`${lbl} (${pct}%)`, legX + 16, legY + 1);
+        ctx.fillStyle = "#64748b";
+        ctx.font = "11px sans-serif";
+        ctx.fillText(`$${val.toFixed(2)}`, legX + 16, legY + 15);
+        legY += 38;
+      });
+    }
+
+    function drawGroupedAnnualChart(canvasId, labels, ingresosArr, gastosArr) {
+      const info = prepareCanvas(canvasId, 260);
+      if (!info) return;
+      const { ctx, width, height } = info;
+
+      const padLeft = 52;
+      const padRight = 18;
+      const padTop = 28;
+      const padBottom = 28;
+      const plotW = Math.max(100, width - padLeft - padRight);
+      const plotH = Math.max(80, height - padTop - padBottom);
+
+      const maxVal = Math.max(10, ...ingresosArr, ...gastosArr);
+      const groupW = plotW / labels.length;
+      const barW = Math.max(4, Math.min(14, groupW * 0.32));
+
+      // Leyenda arriba
+      ctx.font = "bold 11.5px sans-serif";
+      ctx.fillStyle = "#059669";
+      ctx.fillRect(padLeft, 8, 12, 12);
+      ctx.fillText("Ingresos ($)", padLeft + 17, 18);
+
+      ctx.fillStyle = "#e11d48";
+      ctx.fillRect(padLeft + 115, 8, 12, 12);
+      ctx.fillText("Gastos ($)", padLeft + 132, 18);
+
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.beginPath();
+      ctx.moveTo(padLeft, padTop + plotH);
+      ctx.lineTo(padLeft + plotW, padTop + plotH);
+      ctx.stroke();
+
+      ctx.textAlign = "center";
+      ctx.font = "11px sans-serif";
+
+      labels.forEach((mesShort, i) => {
+        const gx = padLeft + i * groupW + groupW / 2;
+        const ing = Number(ingresosArr[i]) || 0;
+        const gas = Number(gastosArr[i]) || 0;
+
+        const hIng = (ing / maxVal) * plotH;
+        const hGas = (gas / maxVal) * plotH;
+
+        ctx.fillStyle = "#059669";
+        ctx.fillRect(gx - barW - 1, padTop + plotH - hIng, barW, hIng);
+
+        ctx.fillStyle = "#e11d48";
+        ctx.fillRect(gx + 1, padTop + plotH - hGas, barW, hGas);
+
+        ctx.fillStyle = "#334155";
+        ctx.fillText(mesShort, gx, padTop + plotH + 15);
+      });
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#64748b";
+      ctx.fillText(`$${maxVal.toFixed(0)}`, padLeft - 6, padTop + 4);
+      ctx.fillText("$0", padLeft - 6, padTop + plotH);
+    }
+
+    // =========================================================================
+    // EXPORTACIÓN (.XLSX VÍA SHEETJS O CSV DE RESGUARDO) Y JSON
+    // =========================================================================
+    function exportExcelOrCsv() {
+      const gastosRows = appState.gastos.map(g => {
+        const p = parseDateParts(g.fecha);
+        return {
+          Fecha: g.fecha,
+          Mes: p.mes,
+          Anio: p.anio,
+          Semana: p.semana,
+          Categoria: g.categoria,
+          Subcategoria: g.subcategoria,
+          Descripcion: g.descripcion,
+          Tipo_Gasto: g.tipo,
+          Monto: Number(g.monto) || 0,
+          Metodo: g.metodo
+        };
+      });
+
+      if (window.XLSX && typeof window.XLSX.utils !== "undefined") {
+        try {
+          const wb = window.XLSX.utils.book_new();
+          window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(gastosRows), "Gastos");
+
+          const ingresosRows = appState.ingresos.map(i => {
+            const p = parseDateParts(i.fecha);
+            return {
+              Fecha: i.fecha,
+              Mes: p.mes,
+              Anio: p.anio,
+              Fuente: i.fuente,
+              Descripcion: i.descripcion,
+              Monto: Number(i.monto) || 0,
+              Destino: i.destino
+            };
+          });
+          window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(ingresosRows), "Ingresos");
+
+          const anualRows = MESES.map(m => {
+            const s = getMonthSummary(m, appState.activeAnio);
+            return {
+              Mes: m,
+              Capital_Inicial: s.capitalInicial,
+              Ingresos: s.totalIngresos,
+              Gastos_Totales: s.totalGastos,
+              Gasto_Necesario: s.gastoNecesario,
+              Gasto_Innecesario: s.gastoInnecesario,
+              Ahorro_Neto: s.ahorroNeto,
+              Capital_Cierre: s.capitalActual
+            };
+          });
+          window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(anualRows), "Resumen_Anual");
+
+          window.XLSX.writeFile(wb, `Control_Financiero_Personal_${appState.activeAnio}.xlsx`);
+          notify("Exportado a Excel (.xlsx)");
+          return;
+        } catch (e) {
+          // Si SheetJS falla, cae automáticamente a CSV
+        }
+      }
+
+      // Respaldo CSV compatible con Excel
+      const headers = ["Fecha", "Mes", "Anio", "Semana", "Categoria", "Subcategoria", "Descripcion", "Tipo_Gasto", "Monto", "Metodo"];
+      const csvLines = [
+        headers.join(","),
+        ...gastosRows.map(r => headers.map(h => `"${String(r[h]).replace(/"/g, '""')}"`).join(","))
+      ];
+      const blob = new Blob(["\uFEFF" + csvLines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      downloadBlob(blob, `Gastos_${appState.activeAnio}.csv`);
+      notify("Exportado a CSV compatible con Excel");
+    }
+
+    function exportJsonBackup() {
+      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: "application/json" });
+      downloadBlob(blob, `Control_Financiero_2026_Respaldo.json`);
+      notify("Respaldo JSON descargado");
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    // =========================================================================
+    // ARRANQUE SEGURO
+    // =========================================================================
+    function renderAllTabs() {
+      renderDashboardTab();
+      renderGastosTab();
+      renderIngresosTab();
+      renderConfigTab();
+      renderAnualTab();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      try {
+        loadAppState();
+        const today = new Date().toISOString().slice(0, 10);
+        const gFecha = document.getElementById("g-fecha");
+        const iFecha = document.getElementById("i-fecha");
+        if (gFecha) gFecha.value = today;
+        if (iFecha) iFecha.value = today;
+
+        syncAllSelects();
+        renderAllTabs();
+      } catch (err) {
+        showErrorBanner("Error al iniciar la aplicación: " + (err && err.message ? err.message : String(err)));
+      }
+    });
+
+    window.addEventListener("resize", function () {
+      const activePanel = document.querySelector(".tab-panel.active");
+      if (!activePanel) return;
+      if (activePanel.id === "panel-dashboard") renderDashboardTab();
+      if (activePanel.id === "panel-anual") renderAnualTab();
+    });
+  </script>
+</body>
+</html>
